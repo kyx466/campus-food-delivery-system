@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <title>菜品详情</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        img { max-width: 400px; }
+        .field { margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<h2>菜品详情</h2>
+
+<div class="field"><strong>ID：</strong><span id="id"></span></div>
+<div class="field"><strong>名称：</strong><span id="name"></span></div>
+<div class="field"><strong>价格：</strong><span id="price"></span></div>
+<div class="field"><strong>库存：</strong><span id="stock"></span></div>
+<div class="field"><strong>描述：</strong><span id="description"></span></div>
+<div class="field"><strong>食堂：</strong><span id="canteen"></span></div>
+<div class="field"><strong>分类：</strong><span id="category"></span></div>
+<div class="field"><strong>状态：</strong><span id="status"></span></div>
+
+<h3>大图预览</h3>
+<img id="preview" src="" alt="菜品大图"/>
+<script>
+    // 基础URL
+    const BASE_URL = 'http://localhost:8080';
+
+    // 默认看 id=4，可自行改
+    const id = new URLSearchParams(location.search).get('id') || 4;
+
+    console.log('开始获取菜品详情，ID:', id);
+
+    fetch(`${BASE_URL}/food/dishes/${id}/detail`)
+        .then(r => {
+            console.log('API响应状态:', r.status, r.statusText);
+            if (!r.ok) {
+                throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+            }
+            return r.json();
+        })
+        .then(d => {
+            console.log('获取到的数据:', d);
+
+            document.getElementById('id').textContent = d.id;
+            document.getElementById('name').textContent = d.name;
+            document.getElementById('price').textContent = d.price;
+            document.getElementById('stock').textContent = d.stock;
+            document.getElementById('description').textContent = d.description;
+            document.getElementById('canteen').textContent = d.canteenName;
+            document.getElementById('category').textContent = d.categoryName;
+            document.getElementById('status').textContent = d.status === 1 ? '上架' : '下架';
+
+            // 处理图片URL
+            let imageUrl = d.imageUrl;
+            console.log('原始图片URL:', imageUrl);
+
+
+            if (imageUrl && !imageUrl.startsWith('http')) {
+                imageUrl = BASE_URL + '/images' + imageUrl.substring('/food/images'.length);
+            }
+
+            console.log('最终图片URL:', imageUrl);
+            document.getElementById('preview').src = imageUrl;
+
+            // 添加图片加载事件监听
+            document.getElementById('preview').onload = function() {
+                console.log('图片加载成功');
+            };
+            document.getElementById('preview').onerror = function() {
+                console.log('图片加载失败');
+            };
+        })
+        .catch(e => {
+            console.error('加载失败:', e);
+            document.body.innerHTML = '加载失败：' + e;
+        });
+</script>
+
+</body>
+</html>

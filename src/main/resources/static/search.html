@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{%block title%}搜索结果{%endblock%}
+
+{%block main%}
+<div id="tip" class="mb-2 text-muted"></div>
+<div class="row g-3" id="result"></div>
+
+<script>
+    const params = new URLSearchParams(location.search);
+    const type = params.get('type');      // dish | canteen
+    const name = params.get('name');
+
+    document.getElementById('tip').textContent = `“${name}” 的${type==='dish'?'菜品':'商家'}结果：`;
+
+    const url = type==='dish'
+        ? `/dishes/search?name=${encodeURIComponent(name)}`
+        : `/canteens/search?name=${encodeURIComponent(name)}`;   <!-- 后端若没这个接口先用 /canteens 全量前端过滤 -->
+
+    axios.get(url)
+        .then(res => {
+            const box = document.getElementById('result');
+            const list = res.data;
+            if (!list.length) return box.innerHTML = '<div class="text-muted">无结果</div>';
+
+            /* 统一卡片格式 */
+            box.innerHTML = list.map(item => `
+          <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100">
+              <img src="${item.imageUrl || '/images/default_'+type+'.png'}" class="card-img-top" style="height:160px;object-fit:cover;">
+              <div class="card-body p-2">
+                <h6 class="card-title mb-1">${item.name}</h6>
+                ${type==='dish'
+                ? `<div class="d-flex justify-content-between"><span class="text-danger fw-bold">¥${item.price}</span><small class="text-muted">库存 ${item.stock}</small></div>`
+                : `<small class="text-muted">${item.location || ''}</small>`
+            }
+              </div>
+              <a href="/${type}.html?id=${item.id}" class="stretched-link"></a>
+            </div>
+          </div>
+        `).join('');
+        })
+        .catch(err => alert('搜索失败：' + err));
+</script>
+{%endblock%}

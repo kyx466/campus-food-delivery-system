@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <title>上传菜品图片</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        label { display: block; margin: 8px 0; }
+        img { max-width: 300px; margin-top: 10px; }
+        #result { white-space: pre-wrap; background: #f4f4f4; padding: 10px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<h2>1. 选择菜品图片</h2>
+<label>菜品 ID：</label><input type="number" id="dishId" value="4"/>
+<label>图片文件：</label><input type="file" id="imageFile" accept="image/*" onchange="preview()"/>
+<button onclick="upload()">上传</button>
+
+<h3>图片预览</h3>
+<img id="previewImg" src="" alt="预览"/>
+
+<h3>上传结果</h3>
+<div id="result"></div>
+
+<script>
+    // 本地预览
+    function preview() {
+        const file = document.getElementById('imageFile').files[0];
+        if (file) {
+            document.getElementById('previewImg').src = URL.createObjectURL(file);
+        }
+    }
+
+    // 上传文件
+    async function upload() {
+        const id = document.getElementById('dishId').value;
+        const file = document.getElementById('imageFile').files[0];
+        if (!file) {
+            alert('请先选择图片');
+            return;
+        }
+
+        const form = new FormData();
+        form.append('image', file);
+
+        try {
+            const res = await fetch(`http://localhost:8080/food/dishes/${id}/image`, {
+                method: 'POST',
+                body: form
+            });
+            const data = await res.json();
+            document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+            // 把返回的图片 URL 显示在预览区
+            document.getElementById('previewImg').src = data.imageUrl;
+        } catch (e) {
+            document.getElementById('result').textContent = '上传失败：' + e;
+        }
+    }
+</script>
+
+</body>
+</html>

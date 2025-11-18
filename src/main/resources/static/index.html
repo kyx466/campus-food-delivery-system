@@ -1,0 +1,33 @@
+<!-- 继承 layout -->
+<!-- 用 {%block%} 只是占位，实际把下面代码整份复制到 index.html 即可 -->
+{% extends "layout.html" %}
+
+{%block title%}全部菜品{%endblock%}
+
+{%block main%}
+<div class="row g-3" id="dishList"></div>
+
+<script>
+    /* 拉全部菜品 */
+    axios.get('/dishes').then(res => {
+        const box = document.getElementById('dishList');
+        if (!res.data.length) return box.innerHTML = '<div class="text-muted">暂无菜品</div>';
+        box.innerHTML = res.data.map(d => `
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card h-100">
+            <img src="${d.imageUrl || '/images/default_dish.png'}" class="card-img-top" style="height:160px;object-fit:cover;">
+            <div class="card-body p-2">
+              <h6 class="card-title mb-1">${d.name}</h6>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-danger fw-bold">¥${d.price}</span>
+                <small class="text-muted">库存 ${d.stock}</small>
+              </div>
+              <span class="badge ${d.status===1?'bg-success':'bg-secondary'}">${d.status===1?'上架':'下架'}</span>
+            </div>
+            <a href="/dish.html?id=${d.id}" class="stretched-link"></a>
+          </div>
+        </div>
+      `).join('');
+    }).catch(err => alert('加载菜品失败：' + err));
+</script>
+{%endblock%}
