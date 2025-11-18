@@ -1,0 +1,58 @@
+body {
+    font-family: "Helvetica Neue", sans-serif;
+    margin: 0;
+    background: #f5f5f5;
+}
+header {
+    background: #fff;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.filter {
+    display: flex;
+    gap: 10px;
+}
+main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px;
+}
+.dish-card {
+    background: #fff;
+    border-radius: 8px;
+    width: 220px;
+    padding: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    text-align: center;
+}
+.dish-card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+.dish-card h3 {
+    margin: 10px 0 5px;
+    font-size: 16px;
+}
+.dish-card p {
+    margin: 5px 0;
+    color: #e55;
+    font-weight: bold;
+}
+.dish-card button {
+    margin-top: 8px;
+    padding: 6px 12px;
+    border: none;
+    background: #007bff;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.dish-card button:hover {
+    background: #0056b3;
+}

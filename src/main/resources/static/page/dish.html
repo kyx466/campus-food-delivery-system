@@ -1,0 +1,149 @@
+<!-- page/dish.html -->
+<div class="filter">
+    <button onclick="backToCategory()" class="back-btn">← 返回分类</button>
+
+    <select id="canteenSelect">
+        <option value="">全部食堂</option>
+    </select>
+
+    <input id="searchInput" type="text" placeholder="搜菜品">
+
+    <button id="searchBtn">搜索</button>
+</div>
+
+<!-- 列表区域 -->
+<div id="dishList"></div>
+
+<script>
+    /* ====== 基础准备 ====== */
+    const BASE     = '/food';                       // 统一前缀
+    const catId    = sessionStorage.getItem('catId');
+    const catName  = sessionStorage.getItem('catName');
+
+    /* 如果有分类名，把页面小标题换掉（可选） */
+    if (catName && !document.querySelector('h2')) {
+        const h = document.createElement('h2');
+        h.textContent = catName;
+        document.querySelector('.filter').prepend(h);
+    }
+
+    /* ====== 首次加载 ====== */
+    loadCanteens();   // 下拉框
+    loadDishes();     // 列表
+
+    /* ====== 事件绑定 ====== */
+    document.getElementById('searchBtn').addEventListener('click', loadDishes);
+    document.getElementById('searchInput').addEventListener('keyup', e => {
+        if (e.key === 'Enter') loadDishes();
+    });
+    document.getElementById('canteenSelect').addEventListener('change', loadDishes);
+
+    /* ====== 函数 ====== */
+    function loadCanteens() {
+        fetch(`${BASE}/canteens`)
+            .then(r => r.json())
+            .then(arr => {
+                const sel = document.getElementById('canteenSelect');
+                sel.innerHTML = '<option value="">全部食堂</option>';
+                arr.forEach(c => {
+                    const op = document.createElement('option');
+                    op.value = c.id;
+                    op.textContent = c.name;
+                    sel.appendChild(op);
+                });
+            });
+    }
+
+    function loadDishes() {
+        const canteenId = document.getElementById('canteenSelect').value;
+        const name      = document.getElementById('searchInput').value.trim();
+
+        let url;
+        if (catId) {                                    // ① 指定分类
+            url = `${BASE}/dishes/categories/${catId}`;
+        } else if (canteenId) {                        // ② 指定食堂
+            url = `${BASE}/dishes/canteens/${canteenId}`;
+        } else if (name) {                             // ③ 搜索
+            url = `${BASE}/dishes/search?name=${encodeURIComponent(name)}`;
+        } else {                                       // ④ 全部
+            url = `${BASE}/dishes`;
+        }
+
+        fetch(url)
+            .then(r => r.json())
+            .then(arr => renderList(arr));
+    }
+
+    /* 渲染列表 */
+    function renderList(arr) {
+        const box = document.getElementById('dishList');
+        if (!arr || arr.length === 0) {
+            box.innerHTML = '<p style="text-align:center;color:#999">暂无菜品</p>';
+            return;
+        }
+        box.innerHTML = arr.map(d => `
+        <div class="dish-card" onclick="location.href='detail.html?id=${d.id}'">
+            <img src="${d.imageUrl}" onerror="this.src='https://via.placeholder.com/200x140?text=🍲'">
+            <h3>${d.name}</h3>
+            <p>￥${d.price}</p>
+            <span>库存：${d.stock}</span>
+        </div>`).join('');
+    }
+
+    /* 返回分类墙 */
+    function backToCategory() {
+        sessionStorage.removeItem('catId');
+        sessionStorage.removeItem('catName');
+        loadPage('category');   // fram.js 提供的全局函数
+    }
+</script>
+
+<!-- 可选：当前页专用样式 -->
+<style>
+    .filter {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .back-btn {
+        padding: 6px 12px;
+        border: 1px solid #1890ff;
+        color: #1890ff;
+        background: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .back-btn:hover {
+        background: #e6f7ff;
+    }
+    .dish-card {
+        display: inline-block;
+        width: 220px;
+        margin: 10px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform .2s;
+    }
+    .dish-card:hover {
+        transform: translateY(-2px);
+    }
+    .dish-card img {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    .dish-card h3 {
+        margin: 8px 0 4px;
+        font-size: 16px;
+    }
+    .dish-card p {
+        color: #e55;
+        font-weight: bold;
+    }
+</style>

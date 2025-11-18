@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <title>菜品管理</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        input, button { padding: 6px 10px; margin: 4px 0; }
+        #addResult { margin-top: 20px; white-space: pre-wrap; background: #f4f4f4; padding: 10px; }
+    </style>
+</head>
+<body>
+<label>分类筛选</label>
+<select id="catSelect" onchange="loadDishes()">
+    <option value="">全部分类</option>
+    <option value="1">主食</option>
+    <option value="2">饮品</option>
+    <option value="3">小吃</option>
+</select>
+
+<h2>新增菜品</h2>
+<label>名称</label><input id="name" value="宫保鸡丁"/>
+<label>价格</label><input id="price" type="number" value="15"/>
+<label>库存</label><input id="stock" type="number" value="50"/>
+<label>描述</label><input id="description" value="微辣，花生脆"/>
+<label>食堂 ID</label><input id="canteenId" type="number" value="1"/>
+<label>分类 ID</label><input id="categoryId" type="number" value="1"/>
+<label>图片 URL</label><input id="imageUrl" value="https://via.placeholder.com/300x200?kungpao"/>
+<button onclick="addDish()">提交</button>
+<div id="addResult"></div>
+
+<h2>菜品列表</h2>
+<button onclick="loadDishes()">刷新列表</button>
+<table id="dishTable">
+    <thead>
+    <tr>
+        <th>ID</th><th>名称</th><th>价格</th><th>库存</th><th>操作</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    // 加载全部菜品
+    async function loadDishes() {
+        const catId = document.getElementById('catSelect').value;
+        const url = catId
+            ? `http://localhost:8080/food/categories/${catId}/dishes`
+            : 'http://localhost:8080/food/dishes';
+        const res = await fetch(url);
+        const list = await res.json();
+        // 下面不变，只换 URL
+        const tbody = document.querySelector('#dishTable tbody');
+        tbody.innerHTML = '';
+        list.forEach(d => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+      <td>${d.id}</td>
+      <td>${d.name}</td>
+      <td>${d.price}</td>
+      <td>${d.stock}</td>
+      <td><button onclick="deleteDish(${d.id})">删除</button></td>
+    `;
+            tbody.appendChild(tr);
+        });
+    }
+    // 新增菜品
+    async function addDish() {
+        const body = {
+            name: document.getElementById('name').value,
+            price: parseFloat(document.getElementById('price').value),
+            stock: parseInt(document.getElementById('stock').value),
+            description: document.getElementById('description').value,
+            canteenId: parseInt(document.getElementById('canteenId').value),
+            categoryId: parseInt(document.getElementById('categoryId').value),
+            imageUrl: document.getElementById('imageUrl').value
+        };
+        const res = await fetch('http://localhost:8080/food/dishes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        document.getElementById('addResult').textContent = JSON.stringify(data, null, 2);
+        loadDishes(); // 自动刷新列表
+    }
+
+    // 删除菜品
+    async function deleteDish(id) {
+        if (!confirm(`确定删除 ID=${id} 吗？`)) return;
+        await fetch(`http://localhost:8080/food/dishes/${id}`, { method: 'DELETE' });
+        loadDishes(); // 刷新
+    }
+
+    // 页面打开就加载一次
+    loadDishes();
+</script>
+
+</body>
+</html>

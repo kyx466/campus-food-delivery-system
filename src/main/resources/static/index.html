@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>校园食堂外卖</title>
+    <!-- 1. 框架样式 -->
+    <link rel="stylesheet" href="/food/css/fram.css">
+</head>
+<body>
+<div class="container">
+    <nav class="side-nav">
+        <h2>学生点餐</h2>
+        <ul>
+            <li><a href="#" data-page="category" class="active">🍱 菜品浏览</a></li>
+            <li><a href="#" data-page="order">🛒 立即下单</a></li>
+            <li><a href="#" data-page="my-order">📋 我的订单</a></li>
+            <li><a href="#" data-page="review">⭐ 评价中心</a></li>
+        </ul>
+    </nav>
+    <main id="content">
+        <!-- 初始加载时会显示分类页面 -->
+        <div style="padding: 20px; text-align: center;">
+            <h2>正在加载...</h2>
+        </div>
+    </main>
+</div>
+<!-- index.html 底部 -->
+<script src="/food/js/fram.js"></script>
+<script>
+    // 确保DOM加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 设置默认激活的导航项
+        setActive('category');
+        // 加载分类页面
+        loadPage('category');
+    });
+</script>
+</body>
+</html>
