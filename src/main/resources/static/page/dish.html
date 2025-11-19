@@ -1,149 +1,64 @@
-<!-- page/dish.html -->
-<div class="filter">
-    <button onclick="backToCategory()" class="back-btn">← 返回分类</button>
-
-    <select id="canteenSelect">
-        <option value="">全部食堂</option>
-    </select>
-
-    <input id="searchInput" type="text" placeholder="搜菜品">
-
-    <button id="searchBtn">搜索</button>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>菜品列表</title>
+    <link rel="stylesheet" href="/food/css/dish.css">
+</head>
+<body>
+<div class="dish-container">
+    <div class="dish-header">
+        <button class="back-btn" onclick="backToCategory()">← 返回分类</button>
+        <h2 id="categoryTitle">菜品列表</h2>
+    </div>
+    <div class="dish-list" id="dishList">
+        <div class="loading">加载中...</div>
+    </div>
 </div>
 
-<!-- 列表区域 -->
-<div id="dishList"></div>
-
 <script>
-    /* ====== 基础准备 ====== */
-    const BASE     = '/food';                       // 统一前缀
-    const catId    = sessionStorage.getItem('catId');
-    const catName  = sessionStorage.getItem('catName');
+    // 页面加载时显示对应分类的菜品
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('=== dish.html DOMContentLoaded ===');
 
-    /* 如果有分类名，把页面小标题换掉（可选） */
-    if (catName && !document.querySelector('h2')) {
-        const h = document.createElement('h2');
-        h.textContent = catName;
-        document.querySelector('.filter').prepend(h);
-    }
+        const catId = sessionStorage.getItem('catId');
+        const catName = sessionStorage.getItem('catName');
 
-    /* ====== 首次加载 ====== */
-    loadCanteens();   // 下拉框
-    loadDishes();     // 列表
+        console.log('从sessionStorage获取:', {catId, catName});
 
-    /* ====== 事件绑定 ====== */
-    document.getElementById('searchBtn').addEventListener('click', loadDishes);
-    document.getElementById('searchInput').addEventListener('keyup', e => {
-        if (e.key === 'Enter') loadDishes();
+        // 设置分类标题
+        const titleEl = document.getElementById('categoryTitle');
+        if (catName) {
+            titleEl.textContent = catName;
+        }
+
+        // 加载菜品数据
+        if (catId) {
+            console.log('开始加载分类ID为', catId, '的菜品');
+            // 调用fram.js中的函数
+            if (typeof loadDishesByCategory === 'function') {
+                loadDishesByCategory(catId);
+            } else {
+                console.error('loadDishesByCategory函数未定义');
+            }
+        } else {
+            console.error('未找到分类ID');
+            document.getElementById('dishList').innerHTML = '<div class="error">未选择分类</div>';
+        }
     });
-    document.getElementById('canteenSelect').addEventListener('change', loadDishes);
 
-    /* ====== 函数 ====== */
-    function loadCanteens() {
-        fetch(`${BASE}/canteens`)
-            .then(r => r.json())
-            .then(arr => {
-                const sel = document.getElementById('canteenSelect');
-                sel.innerHTML = '<option value="">全部食堂</option>';
-                arr.forEach(c => {
-                    const op = document.createElement('option');
-                    op.value = c.id;
-                    op.textContent = c.name;
-                    sel.appendChild(op);
-                });
-            });
-    }
-
-    function loadDishes() {
-        const canteenId = document.getElementById('canteenSelect').value;
-        const name      = document.getElementById('searchInput').value.trim();
-
-        let url;
-        if (catId) {                                    // ① 指定分类
-            url = `${BASE}/dishes/categories/${catId}`;
-        } else if (canteenId) {                        // ② 指定食堂
-            url = `${BASE}/dishes/canteens/${canteenId}`;
-        } else if (name) {                             // ③ 搜索
-            url = `${BASE}/dishes/search?name=${encodeURIComponent(name)}`;
-        } else {                                       // ④ 全部
-            url = `${BASE}/dishes`;
-        }
-
-        fetch(url)
-            .then(r => r.json())
-            .then(arr => renderList(arr));
-    }
-
-    /* 渲染列表 */
-    function renderList(arr) {
-        const box = document.getElementById('dishList');
-        if (!arr || arr.length === 0) {
-            box.innerHTML = '<p style="text-align:center;color:#999">暂无菜品</p>';
-            return;
-        }
-        box.innerHTML = arr.map(d => `
-        <div class="dish-card" onclick="location.href='detail.html?id=${d.id}'">
-            <img src="${d.imageUrl}" onerror="this.src='https://via.placeholder.com/200x140?text=🍲'">
-            <h3>${d.name}</h3>
-            <p>￥${d.price}</p>
-            <span>库存：${d.stock}</span>
-        </div>`).join('');
-    }
-
-    /* 返回分类墙 */
+    // 返回分类
     function backToCategory() {
-        sessionStorage.removeItem('catId');
-        sessionStorage.removeItem('catName');
-        loadPage('category');   // fram.js 提供的全局函数
+        console.log('返回分类页面');
+        if (typeof loadPage === 'function') {
+            loadPage('category');
+        } else {
+            window.history.back();
+        }
     }
-</script>
 
-<!-- 可选：当前页专用样式 -->
-<style>
-    .filter {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-    .back-btn {
-        padding: 6px 12px;
-        border: 1px solid #1890ff;
-        color: #1890ff;
-        background: #fff;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .back-btn:hover {
-        background: #e6f7ff;
-    }
-    .dish-card {
-        display: inline-block;
-        width: 220px;
-        margin: 10px;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
-        padding: 10px;
-        text-align: center;
-        cursor: pointer;
-        transition: transform .2s;
-    }
-    .dish-card:hover {
-        transform: translateY(-2px);
-    }
-    .dish-card img {
-        width: 100%;
-        height: 140px;
-        object-fit: cover;
-        border-radius: 4px;
-    }
-    .dish-card h3 {
-        margin: 8px 0 4px;
-        font-size: 16px;
-    }
-    .dish-card p {
-        color: #e55;
-        font-weight: bold;
-    }
-</style>
+    // 暴露到全局
+    window.backToCategory = backToCategory;
+</script>
+</body>
+</html>

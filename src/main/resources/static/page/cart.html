@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>购物车</title>
+  <link rel="stylesheet" href="/food/css/cart.css">
+  <style>
+    /* 紧急修复 - body宽度 */
+    html, body {
+      width: 100% !important;
+      min-width: 1000px !important;
+      overflow-x: auto !important;
+      margin: 0 !important;
+      padding: 20px !important;
+      box-sizing: border-box !important;
+    }
+
+    /* 基础样式确保显示正常 */
+    .cart-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      width: 100% !important;
+      min-width: 600px !important;
+    }
+    .cart-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      margin-right: 15px;
+      padding: 8px 12px;
+    }
+    .cart-items {
+      min-height: 400px;
+      width: 100% !important;
+      min-width: 600px !important;
+      overflow: visible;
+    }
+    .cart-item {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: white;
+      width: 100%;
+    }
+    .cart-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-right: 15px;
+    }
+    .item-info {
+      flex: 1;
+    }
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      margin: 0 15px;
+    }
+    .quantity-btn {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+    }
+    .quantity-display {
+      margin: 0 10px;
+    }
+    .remove-btn {
+      background: #ff4444;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .cart-footer {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      width: 100%;
+    }
+    .checkout-btn {
+      width: 100%;
+      padding: 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .empty-cart, .loading, .error {
+      text-align: center;
+      padding: 50px 20px;
+      width: 100%;
+    }
+    .browse-btn {
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="cart-container">
+  <div class="cart-header">
+    <button class="back-btn" onclick="backToPrevious()">← 返回</button>
+    <h1>购物车</h1>
+  </div>
+
+  <div id="cartItems" class="cart-items">
+    <div class="loading">加载中...</div>
+  </div>
+
+  <div class="cart-footer">
+    <div class="cart-total">
+      <div class="total-row">
+        <span>总计:</span>
+        <span class="total-amount">¥<span id="totalAmount">0.00</span></span>
+      </div>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn">立即下单</button>
+  </div>
+</div>
+
+<script>
+  console.log('🛒 购物车页面脚本开始执行 - 强制加载版本');
+
+  // 强制显示购物车数据
+  function forceLoadCart() {
+    console.log('🎯 强制加载购物车数据...');
+
+    const cartItems = document.getElementById('cartItems');
+    if (!cartItems) {
+      console.error('❌ cartItems 元素未找到');
+      return;
+    }
+
+    // 显示加载状态
+    cartItems.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">强制加载中...</div>';
+
+    // 直接获取数据并显示
+    fetch('/food/cart/items')
+            .then(r => {
+              console.log('API响应状态:', r.status);
+              if (!r.ok) throw new Error('加载失败: ' + r.status);
+              return r.json();
+            })
+            .then(items => {
+              console.log('✅ 获取到数据, 数量:', items.length);
+
+              if (!items || items.length === 0) {
+                cartItems.innerHTML = `
+            <div class="empty-cart">
+              <div class="empty-icon">🛒</div>
+              <p>购物车为空</p>
+              <button class="browse-btn" onclick="goToCategory()">去逛逛</button>
+            </div>
+          `;
+                return;
+              }
+
+              // 直接渲染商品
+              let total = 0;
+              let html = '';
+
+              items.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+
+                html += `
+            <div class="cart-item" data-dish-id="${item.dishId}">
+              <img src="https://picsum.photos/100/100?random=${item.dishId}" alt="${item.dishName}">
+              <div class="item-info">
+                <h3>${item.dishName}</h3>
+                <p>单价: ¥${item.price}</p>
+              </div>
+              <div class="quantity-control">
+                <button class="quantity-btn minus-btn" data-dish-id="${item.dishId}">-</button>
+                <span class="quantity-display">${item.quantity}</span>
+                <button class="quantity-btn plus-btn" data-dish-id="${item.dishId}">+</button>
+              </div>
+              <div class="item-subtotal">¥${subtotal.toFixed(2)}</div>
+              <button class="remove-btn" data-dish-id="${item.dishId}">删除</button>
+            </div>
+          `;
+              });
+
+              cartItems.innerHTML = html;
+              document.getElementById('totalAmount').textContent = total.toFixed(2);
+
+              console.log('🎉 强制渲染完成!');
+
+              // 设置事件监听
+              setupCartEventListeners();
+            })
+            .catch(err => {
+              console.error('强制加载失败:', err);
+              cartItems.innerHTML = `
+          <div class="error">
+            <p>加载失败: ${err.message}</p>
+            <button onclick="forceLoadCart()" style="margin-top: 10px; padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              重试加载
+            </button>
+          </div>
+        `;
+            });
+  }
+
+  // 事件委托处理
+  function setupCartEventListeners() {
+    const cartItems = document.getElementById('cartItems');
+
+    cartItems.addEventListener('click', function(event) {
+      const target = event.target;
+      const dishId = parseInt(target.getAttribute('data-dish-id'));
+
+      if (!dishId) return;
+
+      if (target.classList.contains('minus-btn')) {
+        const currentItem = target.closest('.cart-item');
+        const quantityDisplay = currentItem.querySelector('.quantity-display');
+        const currentQuantity = parseInt(quantityDisplay.textContent);
+
+        if (currentQuantity > 1) {
+          updateQuantity(dishId, currentQuantity - 1);
+        } else {
+          removeFromCart(dishId);
+        }
+      }
+      else if (target.classList.contains('plus-btn')) {
+        const currentItem = target.closest('.cart-item');
+        const quantityDisplay = currentItem.querySelector('.quantity-display');
+        const currentQuantity = parseInt(quantityDisplay.textContent);
+
+        updateQuantity(dishId, currentQuantity + 1);
+      }
+      else if (target.classList.contains('remove-btn')) {
+        removeFromCart(dishId);
+      }
+    });
+  }
+
+  // 更新数量
+  function updateQuantity(dishId, newQuantity) {
+    console.log('更新数量:', dishId, newQuantity);
+
+    if (newQuantity < 0) return;
+
+    // 禁用相关按钮
+    const buttons = document.querySelectorAll(`[data-dish-id="${dishId}"]`);
+    buttons.forEach(btn => btn.disabled = true);
+
+    fetch('/food/cart/update', {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ dishId, quantity: newQuantity })
+    })
+            .then(r => {
+              if (!r.ok) throw new Error('更新失败');
+              // 重新加载数据
+              forceLoadCart();
+            })
+            .catch(err => {
+              console.error('更新失败:', err);
+              alert('更新失败: ' + err.message);
+              buttons.forEach(btn => btn.disabled = false);
+            });
+  }
+
+  // 删除商品
+  function removeFromCart(dishId) {
+    if (!confirm('确定要删除这个菜品吗？')) return;
+
+    const removeBtn = document.querySelector(`.remove-btn[data-dish-id="${dishId}"]`);
+    if (removeBtn) {
+      removeBtn.textContent = '删除中...';
+      removeBtn.disabled = true;
+    }
+
+    fetch(`/food/cart/item/${dishId}`, { method: 'DELETE' })
+            .then(r => {
+              if (!r.ok) throw new Error('删除失败');
+              // 重新加载数据
+              forceLoadCart();
+            })
+            .catch(err => {
+              console.error('删除失败:', err);
+              alert('删除失败: ' + err.message);
+              if (removeBtn) {
+                removeBtn.textContent = '删除';
+                removeBtn.disabled = false;
+              }
+            });
+  }
+
+  // 立即下单
+  function checkout() {
+    fetch('/food/cart/items')
+            .then(r => r.json())
+            .then(items => {
+              if (!items || items.length === 0) {
+                alert('购物车为空，请先添加商品');
+                return;
+              }
+
+              console.log('跳转到订单页面');
+              if (typeof parent.loadPage === 'function') {
+                parent.loadPage('order');
+              } else if (typeof loadPage === 'function') {
+                loadPage('order');
+              } else {
+                window.location.href = '/food/page/order.html';
+              }
+            })
+            .catch(err => {
+              alert('下单失败: ' + err.message);
+            });
+  }
+
+  // 返回上一页
+  function backToPrevious() {
+    if (typeof loadPage === 'function') loadPage('category');
+    else window.history.back();
+  }
+
+  // 去分类页面
+  function goToCategory() {
+    if (typeof loadPage === 'function') loadPage('category');
+  }
+
+  // 页面加载时立即强制加载数据
+  console.log('🛒 立即执行强制加载...');
+
+  // ✅ 直接绑定事件，不等 DOMContentLoaded
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', checkout);
+    console.log('✅ 立即下单按钮事件绑定成功');
+  } else {
+    console.error('❌ 未找到 checkoutBtn 按钮');
+  }
+
+  const backBtn = document.querySelector('.back-btn');
+  if (backBtn) {
+    backBtn.addEventListener('click', backToPrevious);
+    console.log('✅ 返回按钮事件绑定成功');
+  }
+
+
+  // 多重保险：立即执行 + 延迟执行
+  setTimeout(() => {
+    console.log('🛒 开始强制加载购物车数据');
+    forceLoadCart();
+  }, 100);
+
+  // 最终保险：3秒后如果还在加载中，重新加载
+  setTimeout(() => {
+    const cartItems = document.getElementById('cartItems');
+    if (cartItems && cartItems.innerHTML.includes('加载中')) {
+      console.log('🛒 保险机制：重新强制加载');
+      forceLoadCart();
+    }
+  }, 3000);
+
+  // 暴露函数到全局
+  window.forceLoadCart = forceLoadCart;
+  window.updateQuantity = updateQuantity;
+  window.removeFromCart = removeFromCart;
+  window.checkout = checkout;
+  window.backToPrevious = backToPrevious;
+  window.goToCategory = goToCategory;
+</script>
+</body>
+</html>

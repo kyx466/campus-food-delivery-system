@@ -1,5 +1,6 @@
 package com.ch.schoolwaimai.controller;
 
+import com.ch.schoolwaimai.dao.DishListDto;
 import com.ch.schoolwaimai.dto.DishCreateDto;
 import com.ch.schoolwaimai.dto.DishDetailDto;
 import com.ch.schoolwaimai.dto.DishUpdateDto;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/dishes")
@@ -36,8 +38,11 @@ public class DishController {
         dishService.deleteById(id);
     }
     @GetMapping("/categories/{categoryId}")
-    public List<Dish> listByCategory(@PathVariable Long categoryId) {
-        return dishService.listByCategory(categoryId);
+    public List<DishListDto> listByCategory(@PathVariable Long categoryId) {
+        List<Dish> dishes = dishService.listByCategory(categoryId);
+        return dishes.stream()
+                .map(DishListDto::from)
+                .collect(Collectors.toList());
     }
     @PutMapping("/{id}")
     public Dish update(@PathVariable Long id,

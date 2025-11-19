@@ -1,15 +1,46 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <title>分类</title>
-    <link rel="stylesheet" href="/food/css/category.css">
+    <link rel="stylesheet" href="http://localhost:8080/food/css/category.css">
 </head>
 <body>
 <div class="category-container">
     <h2>请选择分类</h2>
     <div id="catGrid" class="cat-grid"></div>
 </div>
+
+<!-- 引入框架JS -->
+<script src="http://localhost:8080/food/js/fram.js"></script>
+
+<script>
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 如果是在框架中加载，fram.js 会自动调用 initCategoryPage()
+        // 如果是独立访问这个页面，手动初始化
+        if (typeof initCategoryPage === 'function') {
+            initCategoryPage();
+        }
+    });
+
+    // 返回分类列表的函数（解决之前的错误）
+    function backToCategory() {
+        // 在单页应用框架中，直接重新加载分类页面
+        if (typeof loadPage === 'function') {
+            loadPage('category');
+        } else {
+            // 如果是独立页面，刷新
+            window.location.reload();
+        }
+    }
+    box.innerHTML = arr.map(c => `
+    <div class="cat-card" onclick="toDish(${c.id},'${c.name}')">
+
+        <h3>${c.name}</h3>
+        <p>点击查看菜品</p>
+    </div>`).join('');
+
+</script>
 </body>
 </html>

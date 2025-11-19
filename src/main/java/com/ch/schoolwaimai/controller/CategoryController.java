@@ -17,7 +17,11 @@ public class CategoryController {
     private final CategoryDao categoryDao;
 
     @GetMapping
-    public List<Category> list() {
-        return categoryDao.findAll();
+    public List<Category> listAll() {
+        System.out.println("=== 接收到分类列表请求 ===");
+        List<Category> categories = categoryDao.findAll();
+        System.out.println("返回分类数量: " + categories.size());
+        categories.forEach(c -> System.out.println("分类: " + c.getName()));
+        return categories;
     }
 }
