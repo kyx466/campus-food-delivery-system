@@ -1,6 +1,6 @@
 package com.ch.schoolwaimai.controller;
 
-import com.ch.schoolwaimai.dao.DishListDto;
+import com.ch.schoolwaimai.dto.DishListDto;
 import com.ch.schoolwaimai.dto.DishCreateDto;
 import com.ch.schoolwaimai.dto.DishDetailDto;
 import com.ch.schoolwaimai.dto.DishUpdateDto;

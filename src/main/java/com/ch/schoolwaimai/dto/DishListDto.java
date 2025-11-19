@@ -1,4 +1,4 @@
-package com.ch.schoolwaimai.dao;
+package com.ch.schoolwaimai.dto;
 
 import com.ch.schoolwaimai.entity.Dish;
 import lombok.Data;
