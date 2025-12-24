@@ -4,7 +4,44 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a8199999-24f4-4654-b696-8f344ad11301" name="更改" comment="" />
+    <list default="true" id="a8199999-24f4-4654-b696-8f344ad11301" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitattributes" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mvnw" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mvnw.cmd" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/SchoolWaimaiApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/config/CorsConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/config/WebConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/controller/CanteenController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/controller/CategoryController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/controller/DishController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/dao/CanteenDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/dao/CategoryDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/dao/DishDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/dto/DishCreateDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/dto/DishDetailDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/dto/DishUpdateDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/entity/Canteen.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/entity/Category.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/entity/Dish.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/entity/Order.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/entity/OrderItem.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/entity/Review.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/entity/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ch/schoolwaimai/service/DishService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/detail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/layout.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/search.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/test.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/upload.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/uploads/dish_4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/ch/schoolwaimai/SchoolWaimaiApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,6 +50,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "kyx466"
+  }
+}]]></component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
     "url": "https://github.com/kyx466/campus-food-delivery-system.git",
@@ -21,7 +64,7 @@
 }]]></component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "正在合并 main",
     "node.js.selected.package.tslint": "(autodetect)"
   }
 }]]></component>
