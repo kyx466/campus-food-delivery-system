@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{%block title%}校园外卖{%endblock%}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        :root { --theme: #ff6f3c; }
+        body { display: flex; min-height: 100vh; }
+        /* 左侧导航 */
+        .sidebar {
+            width: 200px;
+            background: var(--theme);
+            color: #fff;
+            padding: 1rem .5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar a {
+            color: #fff;
+            display: flex;
+            align-items: center;
+            padding: .6rem .8rem;
+            border-radius: .3rem;
+            text-decoration: none;
+            margin-bottom: .3rem;
+        }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: rgba(255,255,255,.2);
+        }
+        .sidebar i { margin-right: .5rem; }
+        /* 右侧内容 */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        /* 顶部搜索 */
+        .top-search {
+            background: #fff;
+            border-bottom: 1px solid #e6e6e6;
+            padding: .75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+        }
+        /* 主内容 */
+        main {
+            flex: 1;
+            padding: 1rem;
+            background: #f5f5f5;
+        }
+        /* 购物车红点 */
+        .cart-dot {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            background: #dc3545;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 左侧导航 -->
+<nav class="sidebar">
+    <a href="/index.html" class="active"><i class="bi bi-shop-window"></i> 全部菜品</a>
+    <a href="/search.html"><i class="bi bi-search"></i> 搜索</a>
+    <a href="/cart.html"><i class="bi bi-cart3"></i> 购物车 <span class="cart-dot d-none" id="cartDot"></span></a>
+    <a href="/orders.html"><i class="bi bi-list-ul"></i> 我的订单</a>
+    <a href="/profile.html"><i class="bi bi-person"></i> 个人中心</a>
+</nav>
+
+<!-- 右侧内容 -->
+<div class="content">
+    <!-- 顶部搜索栏 -->
+    <header class="top-search">
+        <form id="searchForm" class="row g-2 align-items-center">
+            <div class="col-auto">
+                <div class="btn-group btn-group-sm" role="group">
+                    <input type="radio" class="btn-check" name="type" value="dish" id="typeDish" checked>
+                    <label class="btn btn-outline-secondary" for="typeDish">菜品</label>
+
+                    <input type="radio" class="btn-check" name="type" value="canteen" id="typeCanteen">
+                    <label class="btn btn-outline-secondary" for="typeCanteen">商家</label>
+                </div>
+            </div>
+            <div class="col-auto flex-fill">
+                <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="输入关键词回车">
+            </div>
+        </form>
+    </header>
+
+    <!-- 页面主体 -->
+    <main>{%block main%}{%endblock%}</main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    /* 高亮当前导航 */
+    const cur = location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.sidebar a').forEach(a => {
+        if (a.getAttribute('href').includes(cur)) a.classList.add('active');
+    });
+
+    /* 搜索提交 */
+    document.getElementById('searchForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const type = document.querySelector('input[name="type"]:checked').value;
+        const kw = document.getElementById('searchInput').value.trim();
+        if (!kw) return;
+        location.href = `/search.html?type=${type}&name=${encodeURIComponent(kw)}`;
+    });
+
+    /* 购物车红点 */
+    function updateCartDot() {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const dot = document.getElementById('cartDot');
+        cart.length ? dot.classList.remove('d-none') : dot.classList.add('d-none');
+    }
+    updateCartDot();
+</script>
+</body>
+</html>
